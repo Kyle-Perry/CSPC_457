@@ -267,7 +267,9 @@ static const syscall_t syscalls[] = {
   syscall_t(semP),
   syscall_t(semV),
   syscall_t(privilege),
-  syscall_t(_init_sig_handler)
+  syscall_t(_init_sig_handler),
+  syscall_t(sched_setaffinity),
+  syscall_t(sched_getaffinity)
 };
 
 static_assert(sizeof(syscalls)/sizeof(syscall_t) == SyscallNum::max, "syscall list error");
@@ -278,4 +280,33 @@ extern "C" ssize_t syscall_handler(mword x, mword a1, mword a2, mword a3, mword 
   else DBG::outl(DBG::Tests, "syscall: ", x);
   // TODO: check for signals
   return retcode;
+}
+
+int sched_setaffinity(pid_t pid, size_t cpusetsize, cpu_set_t *mask)
+{
+  
+  if (pid != 0)
+    {
+      return EPERM;
+    }
+  else
+    {
+      
+    }
+  
+  return 0;
+}
+
+int sched_getaffinity(pid_t pid, size_t cpusetsize, cpu_set_t *mask)
+{
+  if (pid != 0)
+    {
+      return EPERM;
+    }
+  else
+    {
+      *mask = LocalProcessor::getCurrThread()->getAffinityMask();
+    }
+
+  return 0;
 }
