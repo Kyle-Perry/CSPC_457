@@ -133,7 +133,28 @@ void Scheduler::preempt() {               // IRQs disabled, lock count inflated
       * switchThread(target) migrates the current thread to 
       * specified target's ready queue
       */
+      mword coreCount = Machine::getProcessorCount();
+      mword bitCount = 0;
+      mword currentQueue = 0;
+      mword queueCount;
+      int x = 0;
+      for(mword bit=1; bit <= coreCount; bit<<=1){
+        if((bit & affinityMask) != 0){
+          Scheduler* sched1 = Machine::getScheduler(bitCount);
+          currentQueue = sched1->readyCount;
+          if(x == 0){
+            queueCount = sched1->readyCount;
+            x = 1;
+          }
+          if(currentQueue <= queueCount){
+            queueCount = sched1->readyCount;
+            Scheduler* sched = Machine::getScheduler(bitCount);
+            target = sched;
+          }
 
+        }
+        bitCount++;
+      }
    } 
 
 #if TESTING_ALWAYS_MIGRATE
