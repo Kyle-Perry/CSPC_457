@@ -243,14 +243,20 @@ extern "C" int isatty(int fd) {
 
 extern "C" int sched_setaffinity(pid_t pid, size_t cpusetsize, cpu_set_t *mask)
 {
-  
-  if (pid != 0)
+  Thread* target = NULL;
+  if(*mask > Machine::getProcessorCount())
     {
-      return -EPERM;
+      return -EINVAL; 
+    }
+  
+  if (pid == 0)
+    {
+      target = LocalProcessor::getCurrThread();
+      target->setAffinityMask(*mask);
     }
   else
     {
-      
+      return -EPERM;
     }
   
   return 0;
@@ -261,7 +267,7 @@ extern "C" int sched_getaffinity(pid_t pid, size_t cpusetsize, cpu_set_t *mask)
   if (pid == 0)
     {
       Thread* current = LocalProcessor::getCurrThread();
-      //*mask = current->getAffinityMask();
+      *mask = current->getAffinityMask();
     }
   else
     {
