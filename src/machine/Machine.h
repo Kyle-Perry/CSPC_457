@@ -42,6 +42,7 @@ public:
   static void initBSP(mword mag, vaddr mb, mword idx)  __section(".boot.text");
   static void bootMain();
 
+  //declared getScheduler
   static Scheduler* getScheduler(mword idx); 
 
   static mword getProcessorCount() { return processorCount; }

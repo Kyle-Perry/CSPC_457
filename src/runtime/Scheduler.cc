@@ -134,26 +134,22 @@ void Scheduler::preempt() {               // IRQs disabled, lock count inflated
       * specified target's ready queue
       */
       mword coreCount = Machine::getProcessorCount();
-      mword bitCount = 0;
+      //mword bitCount = 0;
+      //initialize variables queueCount is max size of mword
       mword currentQueue = 0;
-      mword queueCount;
-      int x = 0;
-      for(mword bit=1; bit <= coreCount; bit<<=1){
-        if((bit & affinityMask) != 0){
-          Scheduler* sched1 = Machine::getScheduler(bitCount);
-          currentQueue = sched1->readyCount;
-          if(x == 0){
-            queueCount = sched1->readyCount;
-            x = 1;
-          }
-          if(currentQueue <= queueCount){
-            queueCount = sched1->readyCount;
-            Scheduler* sched = Machine::getScheduler(bitCount);
+      mword queueCount = 4294967295;
+      mword bitMask = 0x1;
+      for(mword i=0; i<coreCount;i++){
+        //ands each possible bit value if it is not 0 we get the scheduler of the core 
+        if((affinityMask & (bitMask << i)) != 0){
+          Scheduler *sched = Machine::getScheduler(i);
+          //get the readyCount number and compare it to queuecount if it is less then queuecount updates and target is set
+          currentQueue = sched->readyCount;
+          if(currentQueue < queueCount){
+            queueCount = sched->readyCount;
             target = sched;
           }
-
         }
-        bitCount++;
       }
    } 
 

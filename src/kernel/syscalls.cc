@@ -241,27 +241,49 @@ extern "C" int isatty(int fd) {
 //  KABORT1("sbrk"); return (void*)-1;
 //}
 
+
+/**
+   sched_setaffinity
+   
+   changes the affinity mask of process identified by pid, and sets it to the mask pointed at by *mask
+   returns 0 on success, -1 on failure
+   
+   sched_setaffinity fails if the mask includes processors that do not exist in KOS, or if the pid is not 0.
+ */
 extern "C" int sched_setaffinity(pid_t pid, size_t cpusetsize, cpu_set_t *mask)
 {
   Thread* target = NULL;
-  if(*mask > Machine::getProcessorCount())
+  int proCount = Machine::getProcessorCount();
+
+  //check if the mask includes processors not in the OS.
+  if( static_cast<unsigned int>(*mask) >= (0x1 << proCount))
     {
-      return -EINVAL; 
+      errno = EINVAL;
+      return -1; 
     }
   
   if (pid == 0)
     {
       target = LocalProcessor::getCurrThread();
       target->setAffinityMask(*mask);
+      
     }
   else
     {
-      return -EPERM;
+      errno = EPERM;
+      return -1;
     }
   
   return 0;
 }
 
+
+/**
+   sched_getaffinity
+
+   returns the mask of the process identified by pid in *mask
+   return 0 if successful, -1 if pid != 0.
+ */
 extern "C" int sched_getaffinity(pid_t pid, size_t cpusetsize, cpu_set_t *mask)
 {
   if (pid == 0)
@@ -271,7 +293,8 @@ extern "C" int sched_getaffinity(pid_t pid, size_t cpusetsize, cpu_set_t *mask)
     }
   else
     {
-      return -EPERM;
+      errno = EPERM;
+      return -1;
     }
 
   return 0;

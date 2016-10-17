@@ -17,9 +17,24 @@
 #include "kernel/Process.h"
 
 int InitProcess() {
+
+  
+  Process* p5 = knew<Process>();
+  p5->exec("progA");
+  Process* p6 = knew<Process>();
+  p6->exec("progB");
+  Process* p7 = knew<Process>();
+  p7->exec("progC");
+  Process* p8 = knew<Process>();
+  p8->exec("progA");
+  Process* p9 = knew<Process>();
+  p9->exec("progB");
+  Process* p10 = knew<Process>();
+  p10->exec("progC");
+  
   Process* p4 = knew<Process>();
   p4->exec("schedAffinityTest");
- 
+  /*
   Process* p0 = knew<Process>();
   p0->exec("systest");
 #if !TESTING_KEYCODE_LOOP
@@ -30,6 +45,6 @@ int InitProcess() {
   p2->exec("threadtest");
   Process* p3 = knew<Process>();
   p3->exec("manythread");
-
+*/
   return 0;
 }

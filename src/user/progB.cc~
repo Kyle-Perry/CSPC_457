@@ -1,0 +1,14 @@
+#include <iostream>
+#include "syscalls.h"
+
+using namespace std;
+
+int main ()
+{
+  int err = sched_setaffinity( 0, sizeof(cpu_set_t), 0x1 );
+  if( err == -1 ){
+      cout << "sched_setaffinity unsuccessful" << endl; 
+  }
+  for (;;) {}
+  return 0;
+}
